@@ -151,16 +151,16 @@ export const SIDEBAR_ITEMS: SidebarItemDef[] = [
   },
   { id: 'blobbi', label: 'Blobbi', path: '/blobbi', icon: Egg, requiresAuth: true },
   { id: "help", label: "Help", path: "/help", icon: HelpCircle },
-  // Content types
-  { id: "events", label: "Events", path: "/events", icon: CalendarDays },
-  { id: "photos", label: "Photos", path: "/photos", icon: Camera },
+  // Content types — Music & Video prioritized at the top
+  { id: "music", label: "Music", path: "/music", icon: Music },
   { id: "videos", label: "Videos", path: "/videos", icon: Film },
+  { id: "vines", label: "Divines", path: "/vines", icon: Clapperboard },
+  { id: "podcasts", label: "Podcasts", path: "/podcasts", icon: Podcast },
+  { id: "photos", label: "Photos", path: "/photos", icon: Camera },
+  // Other content types
+  { id: "events", label: "Events", path: "/events", icon: CalendarDays },
   { id: "articles", label: "Articles", path: "/articles", icon: BookOpen },
   { id: "books", label: "Books", path: "/books", icon: BookMarked },
-  { id: "vines", label: "Divines", path: "/vines", icon: Clapperboard },
-  { id: "music", label: "Music", path: "/music", icon: Music },
-  { id: "podcasts", label: "Podcasts", path: "/podcasts", icon: Podcast },
-
   { id: "webxdc", label: "Webxdc", path: "/webxdc", icon: Blocks },
   { id: "themes", label: "Themes", path: "/themes", icon: Sparkles },
   { id: "polls", label: "Polls", path: "/polls", icon: BarChart3 },

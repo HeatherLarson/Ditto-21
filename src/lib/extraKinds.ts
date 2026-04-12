@@ -41,7 +41,7 @@ export const SECTION_LABELS: Record<ExtraKindSection, string> = {
   whimsy: 'Whimsy',
 };
 
-/** Ordered list of sections for the "Other Stuff" settings UI. */
+/** Ordered list of sections for the "Other Stuff" settings UI. Music & Video are in media, which comes first. */
 export const SECTION_ORDER: ExtraKindSection[] = ['media', 'social', 'development', 'whimsy'];
 
 /** Metadata for an extra (non-kind-1) content type. */
@@ -130,19 +130,36 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'feed',
     blurb: 'Blog posts, essays, and guides. Write and publish long-form articles.',
   },
-  // Media
+  // Media — Music & Video prioritized at the top
   {
-    kind: 20,
-    id: 'photos',
-    showKey: 'showPhotos',
-    feedKey: 'feedIncludePhotos',
-    label: 'Photos',
-    description: 'Picture-first posts (NIP-68)',
-    route: 'photos',
-    addressable: false,
+    kind: 36787,
+    id: 'music',
+    showKey: 'showMusic',
+    label: 'Music',
+    description: 'Music tracks and playlists',
+    route: 'music',
+    addressable: true,
     section: 'media',
-    blurb: 'Instagram-style photo posts. Share images with captions and tags.',
-    sites: [{ url: 'https://nostr.build', name: 'nostr.build' }],
+    blurb: 'Discover and listen to music tracks and playlists shared on Nostr. Upload music and create playlists from a dedicated music app.',
+    sites: [{ url: 'https://nodecast.xyz' }],
+    subKinds: [
+      {
+        kind: 36787,
+        showKey: 'showMusic',
+        feedKey: 'feedIncludeMusicTracks',
+        label: 'Tracks',
+        description: 'Music tracks (kind 36787)',
+        addressable: true,
+      },
+      {
+        kind: 34139,
+        showKey: 'showMusic',
+        feedKey: 'feedIncludeMusicPlaylists',
+        label: 'Playlists',
+        description: 'Music playlists (kind 34139)',
+        addressable: true,
+      },
+    ],
   },
   {
     kind: 21,
@@ -175,17 +192,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     ],
   },
   {
-    kind: 1222,
-    id: 'voice',
-    feedKey: 'feedIncludeVoiceMessages',
-    label: 'Voice Messages',
-    description: 'Short audio voice messages (NIP-A0)',
-    addressable: false,
-    section: 'media',
-    feedOnly: true,
-    blurb: 'Record and share short voice messages, up to 60 seconds long.',
-  },
-  {
     kind: 34236,
     id: 'vines',
     showKey: 'showVines',
@@ -197,36 +203,6 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
     section: 'media',
     blurb: 'Short video clips. Record and share from a dedicated app.',
     sites: [{ url: 'https://divine.video' }],
-  },
-  {
-    kind: 36787,
-    id: 'music',
-    showKey: 'showMusic',
-    label: 'Music',
-    description: 'Music tracks and playlists',
-    route: 'music',
-    addressable: true,
-    section: 'media',
-    blurb: 'Discover and listen to music tracks and playlists shared on Nostr. Upload music and create playlists from a dedicated music app.',
-    sites: [{ url: 'https://nodecast.xyz' }],
-    subKinds: [
-      {
-        kind: 36787,
-        showKey: 'showMusic',
-        feedKey: 'feedIncludeMusicTracks',
-        label: 'Tracks',
-        description: 'Music tracks (kind 36787)',
-        addressable: true,
-      },
-      {
-        kind: 34139,
-        showKey: 'showMusic',
-        feedKey: 'feedIncludeMusicPlaylists',
-        label: 'Playlists',
-        description: 'Music playlists (kind 34139)',
-        addressable: true,
-      },
-    ],
   },
   {
     kind: 30054,
@@ -256,6 +232,30 @@ export const EXTRA_KINDS: ExtraKindDef[] = [
         addressable: true,
       },
     ],
+  },
+  {
+    kind: 20,
+    id: 'photos',
+    showKey: 'showPhotos',
+    feedKey: 'feedIncludePhotos',
+    label: 'Photos',
+    description: 'Picture-first posts (NIP-68)',
+    route: 'photos',
+    addressable: false,
+    section: 'media',
+    blurb: 'Instagram-style photo posts. Share images with captions and tags.',
+    sites: [{ url: 'https://nostr.build', name: 'nostr.build' }],
+  },
+  {
+    kind: 1222,
+    id: 'voice',
+    feedKey: 'feedIncludeVoiceMessages',
+    label: 'Voice Messages',
+    description: 'Short audio voice messages (NIP-A0)',
+    addressable: false,
+    section: 'media',
+    feedOnly: true,
+    blurb: 'Record and share short voice messages, up to 60 seconds long.',
   },
   // Social
   {
