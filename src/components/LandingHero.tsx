@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Music, Film, Podcast, Play, Headphones, Radio } from 'lucide-react';
+import { Music, Film, Podcast, Play, Headphones, Radio, Bookmark, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { NoteCard } from '@/components/NoteCard';
 import { useAppContext } from '@/hooks/useAppContext';
+import { useFeaturedBookmarks } from '@/hooks/useFeaturedBookmarks';
 
 interface LandingHeroProps {
   onLoginClick: () => void;
@@ -11,6 +14,7 @@ interface LandingHeroProps {
 
 export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
   const { config } = useAppContext();
+  const { data: featuredBookmarks, isLoading: isLoadingBookmarks } = useFeaturedBookmarks(6);
 
   return (
     <div className="landing-hero relative overflow-hidden">
@@ -105,6 +109,55 @@ export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
           </Link>
         </div>
       </div>
+
+      {/* Featured Bookmarks Section */}
+      {(isLoadingBookmarks || (featuredBookmarks && featuredBookmarks.length > 0)) && (
+        <div className="relative z-10 px-4 pb-6 landing-hero-fade" style={{ animationDelay: '400ms' }}>
+          <div className="max-w-3xl mx-auto">
+            {/* Section header */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-600/20">
+                <Sparkles className="size-4 text-amber-500" />
+              </div>
+              <h2 className="text-sm font-semibold text-foreground">Heather's Picks</h2>
+              <div className="flex-1 h-px bg-border/50" />
+              <Link 
+                to="/npub1nl8r463jkdtr0qu0k3dht03jt9t59cttk0j8gtxg9wea2russlnq2zf9d0"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              >
+                <Bookmark className="size-3" />
+                View all
+              </Link>
+            </div>
+
+            {/* Bookmarks grid/list */}
+            {isLoadingBookmarks ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+                    <div className="px-4 py-3">
+                      <div className="flex gap-3">
+                        <Skeleton className="size-10 rounded-full shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-3/4" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : featuredBookmarks && featuredBookmarks.length > 0 ? (
+              <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden divide-y divide-border/50">
+                {featuredBookmarks.map((event) => (
+                  <NoteCard key={event.id} event={event} compact />
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       {/* Section divider with label */}
       <div className="relative z-10 px-4 py-4 border-y border-border bg-card/50 backdrop-blur-sm">
