@@ -1,144 +1,117 @@
 import { Link } from 'react-router-dom';
-import { Music, Film, Clapperboard, Podcast } from 'lucide-react';
+import { Music, Film, Podcast, Play, Headphones, Radio } from 'lucide-react';
 
-import { DittoLogo } from '@/components/DittoLogo';
 import { Button } from '@/components/ui/button';
-import { NoteCard } from '@/components/NoteCard';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useFeaturedMedia } from '@/hooks/useFeaturedMedia';
 
 interface LandingHeroProps {
   onLoginClick: () => void;
   onSignupClick: () => void;
 }
 
-function NoteCardSkeleton() {
-  return (
-    <div className="px-4 py-3 border-b border-border">
-      <div className="flex items-center gap-3">
-        <Skeleton className="size-11 rounded-full shrink-0" />
-        <div className="min-w-0 space-y-1.5">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-3 w-36" />
-        </div>
-      </div>
-      <div className="mt-2 space-y-1.5">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
-      </div>
-    </div>
-  );
-}
-
 export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
   const { config } = useAppContext();
-  const { data: featuredContent, isLoading } = useFeaturedMedia(10);
 
   return (
-    <div className="landing-hero">
-      {/* ── Hero Header ── */}
-      <div className="px-4 pt-8 pb-6 text-center space-y-4">
-        <div className="flex justify-center landing-hero-fade" style={{ animationDelay: '0ms' }}>
-          <DittoLogo size={56} />
-        </div>
+    <div className="landing-hero relative overflow-hidden">
+      {/* Animated background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+      
+      {/* Floating music icons - decorative */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <Music className="absolute top-[10%] left-[5%] size-8 text-primary/10 animate-pulse" style={{ animationDelay: '0s' }} />
+        <Headphones className="absolute top-[20%] right-[10%] size-10 text-primary/10 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <Radio className="absolute bottom-[30%] left-[8%] size-6 text-primary/10 animate-pulse" style={{ animationDelay: '1s' }} />
+        <Play className="absolute top-[40%] right-[5%] size-7 text-primary/10 animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <Music className="absolute bottom-[20%] right-[15%] size-9 text-primary/10 animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
 
-        <div className="space-y-2 landing-hero-fade" style={{ animationDelay: '80ms' }}>
-          <h1 className="text-2xl sidebar:text-3xl font-bold tracking-tight">
+      {/* Main hero content */}
+      <div className="relative z-10 px-4 pt-12 pb-10 text-center">
+        {/* Big headline */}
+        <div className="space-y-4 landing-hero-fade" style={{ animationDelay: '0ms' }}>
+          <h1 className="text-4xl sidebar:text-5xl font-black tracking-tight bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
             {config.appName}
           </h1>
-          <p className="text-muted-foreground text-sm sidebar:text-base max-w-xs mx-auto leading-relaxed">
-            Discover music, videos, and podcasts on Nostr
+          <p className="text-xl sidebar:text-2xl font-medium text-foreground/90 max-w-md mx-auto">
+            Your music. Your way.
+          </p>
+          <p className="text-muted-foreground text-sm sidebar:text-base max-w-sm mx-auto leading-relaxed">
+            Discover independent artists, videos, and podcasts on the decentralized web
           </p>
         </div>
 
-        <div className="flex gap-3 justify-center landing-hero-fade" style={{ animationDelay: '160ms' }}>
-          <Button onClick={onSignupClick} className="rounded-full px-6" size="sm">
-            Sign up
+        {/* CTA buttons */}
+        <div className="flex gap-3 justify-center mt-8 landing-hero-fade" style={{ animationDelay: '100ms' }}>
+          <Button onClick={onSignupClick} size="lg" className="rounded-full px-8 text-base font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
+            Get Started
           </Button>
-          <Button onClick={onLoginClick} variant="outline" className="rounded-full px-6" size="sm">
+          <Button onClick={onLoginClick} variant="outline" size="lg" className="rounded-full px-8 text-base font-semibold">
             Log in
           </Button>
-          <Button variant="outline" className="rounded-full px-6" size="sm" asChild>
-            <Link to="/help">FAQ</Link>
-          </Button>
+        </div>
+
+        {/* Stats or social proof */}
+        <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground landing-hero-fade" style={{ animationDelay: '200ms' }}>
+          <div className="flex items-center gap-1.5">
+            <Music className="size-4 text-primary" />
+            <span>Independent Music</span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1.5">
+            <Film className="size-4 text-primary" />
+            <span>Videos</span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1.5">
+            <Podcast className="size-4 text-primary" />
+            <span>Podcasts</span>
+          </div>
         </div>
       </div>
 
-      {/* ── Quick Links to Content Types ── */}
-      <div className="px-4 pb-5 landing-hero-fade" style={{ animationDelay: '200ms' }}>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-          Explore
-        </p>
-        <div className="grid grid-cols-2 gap-2 sidebar:grid-cols-4">
+      {/* Feature cards */}
+      <div className="relative z-10 px-4 pb-8 landing-hero-fade" style={{ animationDelay: '300ms' }}>
+        <div className="grid grid-cols-1 sidebar:grid-cols-3 gap-4 max-w-3xl mx-auto">
           <Link
             to="/music"
-            className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card/50 hover:border-primary/40 hover:bg-card transition-all"
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-600/20 border border-primary/20 p-6 hover:border-primary/40 hover:from-pink-500/30 hover:to-purple-600/30 transition-all duration-300"
           >
-            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Music className="size-5 text-primary" />
-            </div>
-            <span className="text-xs font-medium text-foreground">Music</span>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+            <Music className="size-10 text-primary mb-3" />
+            <h3 className="text-lg font-bold text-foreground mb-1">Music</h3>
+            <p className="text-sm text-muted-foreground">Tracks and playlists from independent artists</p>
           </Link>
+
           <Link
             to="/videos"
-            className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card/50 hover:border-primary/40 hover:bg-card transition-all"
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-600/20 border border-primary/20 p-6 hover:border-primary/40 hover:from-blue-500/30 hover:to-cyan-600/30 transition-all duration-300"
           >
-            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Film className="size-5 text-primary" />
-            </div>
-            <span className="text-xs font-medium text-foreground">Videos</span>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+            <Film className="size-10 text-primary mb-3" />
+            <h3 className="text-lg font-bold text-foreground mb-1">Videos</h3>
+            <p className="text-sm text-muted-foreground">Music videos, live performances, and more</p>
           </Link>
-          <Link
-            to="/vines"
-            className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card/50 hover:border-primary/40 hover:bg-card transition-all"
-          >
-            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Clapperboard className="size-5 text-primary" />
-            </div>
-            <span className="text-xs font-medium text-foreground">Divines</span>
-          </Link>
+
           <Link
             to="/podcasts"
-            className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border/50 bg-card/50 hover:border-primary/40 hover:bg-card transition-all"
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-600/20 border border-primary/20 p-6 hover:border-primary/40 hover:from-orange-500/30 hover:to-red-600/30 transition-all duration-300"
           >
-            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Podcast className="size-5 text-primary" />
-            </div>
-            <span className="text-xs font-medium text-foreground">Podcasts</span>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-500/20 to-transparent rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+            <Podcast className="size-10 text-primary mb-3" />
+            <h3 className="text-lg font-bold text-foreground mb-1">Podcasts</h3>
+            <p className="text-sm text-muted-foreground">Shows and episodes from creators you love</p>
           </Link>
         </div>
       </div>
 
-      {/* ── Featured Content from Music-Obsessed Creators ── */}
-      <div className="landing-hero-fade" style={{ animationDelay: '280ms' }}>
-        <div className="px-4 py-3 border-y border-border bg-card/30">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Featured
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="divide-y divide-border">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <NoteCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : featuredContent && featuredContent.length > 0 ? (
-          <div>
-            {featuredContent.map((event) => (
-              <NoteCard key={event.id} event={event} />
-            ))}
-          </div>
-        ) : (
-          <div className="px-4 py-8 text-center text-muted-foreground text-sm">
-            No featured content available
-          </div>
-        )}
+      {/* Section divider with label */}
+      <div className="relative z-10 px-4 py-4 border-y border-border bg-card/50 backdrop-blur-sm">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center">
+          Latest from the community
+        </p>
       </div>
-
-      {/* ── Divider into feed ── */}
-      <div className="border-b border-border" />
     </div>
   );
 }
