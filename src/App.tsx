@@ -53,8 +53,21 @@ const hardcodedConfig: AppConfig = {
   homePage: "feed",
   client: "naddr1qvzqqqru7cpzq7q6z5ns2hm5c8msyv83qwzxpxe52j8c4d4q5m92wsp9sflelkh9qqzkg6t5w3hswjl4yp",
   magicMouse: false,
-  theme: "system",
-  autoShareTheme: true,
+  theme: "custom",
+  customTheme: {
+    colors: {
+      background: '276 40% 8%',
+      text: '0 0% 75%',
+      primary: '328 100% 54%',
+    },
+    font: { family: 'Lacquer' },
+    background: {
+      url: 'https://blossom.primal.net/9fa0f1f7cd7da344f3e1db6ecfbdbeb2bb0763d3eaccbc0f5368871d0421b50b.png',
+      mode: 'cover',
+      mimeType: 'image/png',
+    },
+  },
+  autoShareTheme: false,
   useAppRelays: true,
   relayMetadata: {
     relays: [],

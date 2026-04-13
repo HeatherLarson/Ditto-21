@@ -4,24 +4,19 @@ import type { NostrEvent } from '@nostrify/nostrify';
 
 import { DITTO_RELAYS } from '@/lib/appRelays';
 
-/** Curated kinds for the Ditto feed: unique Ditto content types. */
+/** Curated kinds for the Ditto feed: prioritizing music, videos, divines, and podcasts. */
 const CURATED_KINDS = [
-  20,    // Photos (NIP-68)
+  // Music & Audio - prioritized first
+  36787, // Music Tracks
+  34139, // Music Playlists
+  30054, // Podcast Episodes
+  30055, // Podcast Trailers
+  // Video content
   21,    // Videos (NIP-71)
   22,    // Short Videos (NIP-71)
   34236, // Divines (addressable short videos)
-  36787, // Music Tracks
-  34139, // Music Playlists
-  36767, // Themes
-  37381, // Magic Decks
-  3367,  // Color Moments
-  37516, // Treasures
-  7516,  // Treasures (Found Logs)
-  30030, // Emoji Packs
-  30009, // Badge Definitions
-  10008, // Profile Badges
-  30008, // Profile Badges (legacy)
-  31124, // Blobbi
+  // Photos
+  20,    // Photos (NIP-68)
 ];
 
 /** Webxdc needs a MIME-type tag filter, so it gets its own filter object. */
