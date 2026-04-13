@@ -228,8 +228,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   return (
     <main className="flex-1 min-w-0 min-h-dvh">
-      {/* CTA (logged out, main feed only) */}
-      {!user && !kinds && (
+      {/* Hero section (main feed only - shows for everyone) */}
+      {!kinds && (
         <LandingHero
           onLoginClick={() => setLoginDialogOpen(true)}
           onSignupClick={startSignup}
