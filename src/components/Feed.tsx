@@ -22,7 +22,6 @@ import { useMuteList } from '@/hooks/useMuteList';
 import { useSavedFeeds } from '@/hooks/useSavedFeeds';
 import { useStreamPosts } from '@/hooks/useStreamPosts';
 import { useResolveTabFilter } from '@/hooks/useResolveTabFilter';
-import { useCuratorFollowList } from '@/hooks/useCuratorFollowList';
 import { useCuratedDittoFeed } from '@/hooks/useCuratedDittoFeed';
 import { getEnabledFeedKinds } from '@/lib/extraKinds';
 import { diversifyFeedPages } from '@/lib/feedDiversity';
@@ -59,7 +58,6 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const { savedFeeds } = useSavedFeeds();
   const { hashtags } = useInterests();
   const { hashtags: geotags } = useInterests('g');
-  const { data: curatorFollowList, isError: isCuratorError } = useCuratorFollowList();
 
   // Tab settings from localStorage
   const showGlobalFeed = (() => {
@@ -136,9 +134,10 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
     (kinds || tagFilters) ? { kinds, tagFilters } : undefined,
   );
 
-  // Curated Ditto feed: latest content from the curator's follow list.
+  // Global media feed: music, videos, podcasts, photos from all of Nostr.
+  // Used for logged-out landing page and Ditto tab when logged in.
   const topQuery = useCuratedDittoFeed(
-    curatorFollowList,
+    undefined, // No author filter - query globally
     useTopFeedForLoggedOut || !!useDittoTab,
   );
 
@@ -146,7 +145,7 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
   const useDittoQuery = useTopFeedForLoggedOut || useDittoTab;
   const activeQuery = useDittoQuery ? topQuery : feedQuery;
   const queryKey = useMemo(
-    () => useDittoQuery ? ['ditto-curated-feed'] : ['feed', activeTab],
+    () => useDittoQuery ? ['global-media-feed'] : ['feed', activeTab],
     [useDittoQuery, activeTab],
   );
 
@@ -219,9 +218,8 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
       });
   }, [rawData?.pages, muteItems, useDittoQuery]);
 
-  // Show skeletons while loading, but not if the curator list query errored
-  // (that would leave logged-out users staring at infinite skeletons).
-  const showSkeleton = (isPending || (isLoading && !rawData)) && !(useDittoQuery && isCuratorError);
+  // Show skeletons while loading
+  const showSkeleton = isPending || (isLoading && !rawData);
 
   // Kind-specific pages (e.g. Development, WebXDC) only show Follows + Global tabs.
   // Extra tabs (Ditto, Community, saved feeds, hashtags) are only for the home feed.

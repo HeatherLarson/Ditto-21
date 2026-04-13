@@ -19,58 +19,29 @@ const CURATED_KINDS = [
   20,    // Photos (NIP-68)
 ];
 
-/** Webxdc needs a MIME-type tag filter, so it gets its own filter object. */
-const WEBXDC_FILTER = { kinds: [1063], '#m': ['application/x-webxdc'] };
-
 /**
- * Compute a short fingerprint of a string array for use in query keys.
- * Produces a stable, content-dependent value so the query busts when
- * the actual pubkey set changes (not just its length).
- */
-function fingerprint(items: string[]): string {
-  // Simple djb2-style hash — fast and collision-resistant enough for a cache key.
-  let hash = 5381;
-  for (const item of items) {
-    for (let i = 0; i < item.length; i++) {
-      hash = ((hash << 5) + hash + item.charCodeAt(i)) | 0;
-    }
-  }
-  return (hash >>> 0).toString(36);
-}
-
-/**
- * Curated Ditto feed: latest content from the curator's follow list.
- * Standard NIP-01 reverse-chronological pagination (no sort:hot).
+ * Global media feed: latest music, videos, podcasts, and photos from all of Nostr.
+ * No author filtering - shows content from everyone.
+ * Standard NIP-01 reverse-chronological pagination.
  *
- * @param authors - Pubkeys whose content to include (from useCuratorFollowList).
  * @param enabled - Whether the query should run.
  */
-export function useCuratedDittoFeed(authors: string[] | undefined, enabled: boolean) {
+export function useCuratedDittoFeed(_authors: string[] | undefined, enabled: boolean) {
   const { nostr } = useNostr();
-  const authorsKey = authors ? fingerprint(authors) : '';
 
   return useInfiniteQuery<NostrEvent[], Error>({
-    queryKey: ['ditto-curated-feed', authorsKey],
+    queryKey: ['global-media-feed'],
     queryFn: async ({ pageParam, signal }) => {
-      const base: Record<string, unknown> = {
+      const filter: Record<string, unknown> = {
         kinds: CURATED_KINDS,
-        authors,
-        limit: 20,
+        limit: 30,
       };
-      if (pageParam) base.until = pageParam;
-
-      // Webxdc needs a separate filter with MIME-type tag constraint
-      const webxdcFilter: Record<string, unknown> = {
-        ...WEBXDC_FILTER,
-        authors,
-        limit: 20,
-      };
-      if (pageParam) webxdcFilter.until = pageParam;
+      if (pageParam) filter.until = pageParam;
 
       const ditto = nostr.group(DITTO_RELAYS);
       return ditto.query(
-        [base, webxdcFilter] as Parameters<typeof ditto.query>[0],
-        { signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]) },
+        [filter] as Parameters<typeof ditto.query>[0],
+        { signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]) },
       );
     },
     getNextPageParam: (lastPage) => {
@@ -78,7 +49,7 @@ export function useCuratedDittoFeed(authors: string[] | undefined, enabled: bool
       return lastPage[lastPage.length - 1].created_at - 1;
     },
     initialPageParam: undefined as number | undefined,
-    enabled: enabled && !!authors && authors.length > 0,
+    enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     placeholderData: (prev) => prev,
@@ -86,4 +57,4 @@ export function useCuratedDittoFeed(authors: string[] | undefined, enabled: bool
 }
 
 /** Re-export for use in Feed.tsx landing hero / kind lists. */
-export { CURATED_KINDS, WEBXDC_FILTER };
+export { CURATED_KINDS };
