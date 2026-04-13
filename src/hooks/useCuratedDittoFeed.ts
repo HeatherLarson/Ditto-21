@@ -3,6 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
 
 import { DITTO_RELAYS } from '@/lib/appRelays';
+import { FEATURED_PUBKEYS } from '@/hooks/useFeaturedMedia';
 
 /** Curated kinds for the Ditto feed: prioritizing music, videos, divines, and podcasts. */
 const CURATED_KINDS = [
@@ -20,8 +21,8 @@ const CURATED_KINDS = [
 ];
 
 /**
- * Global media feed: latest music, videos, podcasts, and photos from all of Nostr.
- * No author filtering - shows content from everyone.
+ * Global media feed: latest music, videos, podcasts, and photos.
+ * Prioritizes content from featured creators, then shows global content.
  * Standard NIP-01 reverse-chronological pagination.
  *
  * @param enabled - Whether the query should run.
@@ -32,17 +33,50 @@ export function useCuratedDittoFeed(_authors: string[] | undefined, enabled: boo
   return useInfiniteQuery<NostrEvent[], Error>({
     queryKey: ['global-media-feed'],
     queryFn: async ({ pageParam, signal }) => {
-      const filter: Record<string, unknown> = {
+      const ditto = nostr.group(DITTO_RELAYS);
+
+      // Query both featured creators AND global in parallel
+      const featuredFilter: Record<string, unknown> = {
+        kinds: CURATED_KINDS,
+        authors: FEATURED_PUBKEYS,
+        limit: 20,
+      };
+      if (pageParam) featuredFilter.until = pageParam;
+
+      const globalFilter: Record<string, unknown> = {
         kinds: CURATED_KINDS,
         limit: 30,
       };
-      if (pageParam) filter.until = pageParam;
+      if (pageParam) globalFilter.until = pageParam;
 
-      const ditto = nostr.group(DITTO_RELAYS);
-      return ditto.query(
-        [filter] as Parameters<typeof ditto.query>[0],
+      const events = await ditto.query(
+        [featuredFilter, globalFilter] as Parameters<typeof ditto.query>[0],
         { signal: AbortSignal.any([signal, AbortSignal.timeout(15000)]) },
       );
+
+      // Deduplicate and sort: featured creators first, then by timestamp
+      const seen = new Set<string>();
+      const featuredSet = new Set(FEATURED_PUBKEYS);
+      const featured: NostrEvent[] = [];
+      const others: NostrEvent[] = [];
+
+      for (const event of events) {
+        if (seen.has(event.id)) continue;
+        seen.add(event.id);
+
+        if (featuredSet.has(event.pubkey)) {
+          featured.push(event);
+        } else {
+          others.push(event);
+        }
+      }
+
+      // Sort each group by timestamp (newest first)
+      featured.sort((a, b) => b.created_at - a.created_at);
+      others.sort((a, b) => b.created_at - a.created_at);
+
+      // Return featured content first, then others
+      return [...featured, ...others];
     },
     getNextPageParam: (lastPage) => {
       if (lastPage.length === 0) return undefined;
