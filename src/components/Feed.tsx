@@ -228,13 +228,11 @@ export function Feed({ kinds, tagFilters, header, hideCompose, emptyMessage, fee
 
   return (
     <main className="flex-1 min-w-0 min-h-dvh">
-      {/* Hero section (main feed only - shows for everyone) */}
-      {!kinds && (
-        <LandingHero
-          onLoginClick={() => setLoginDialogOpen(true)}
-          onSignupClick={startSignup}
-        />
-      )}
+      {/* Hero section - ALWAYS shows on the main feed */}
+      <LandingHero
+        onLoginClick={() => setLoginDialogOpen(true)}
+        onSignupClick={startSignup}
+      />
 
       {!hideCompose && <ComposeBox compact />}
 
