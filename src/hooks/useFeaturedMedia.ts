@@ -23,15 +23,19 @@ export const FEATURED_PUBKEYS = [
   '312d00fab4860c967c98bb4585971ab1bef9475d51b4becbc9f313f968403f2b',
 ];
 
-/** Check if event contains banned content. */
-function isBanned(event: NostrEvent): boolean {
+/** Check if event contains banned content. Exported for use in other feeds. */
+export function isBannedContent(event: NostrEvent): boolean {
   const content = event.content.toLowerCase();
+  
+  // Ban anything with "suno" anywhere
   if (content.includes('suno')) return true;
   
-  // Also check tags
+  // Also check tags for suno
   for (const tag of event.tags) {
-    if (tag.some(v => typeof v === 'string' && v.toLowerCase().includes('suno'))) {
-      return true;
+    for (const value of tag) {
+      if (typeof value === 'string' && value.toLowerCase().includes('suno')) {
+        return true;
+      }
     }
   }
   return false;
@@ -64,7 +68,7 @@ export function useFeaturedMedia(limit = 8) {
 
       for (const event of events) {
         if (seen.has(event.id)) continue;
-        if (isBanned(event)) continue;
+        if (isBannedContent(event)) continue;
         seen.add(event.id);
         filtered.push(event);
         if (filtered.length >= limit) break;

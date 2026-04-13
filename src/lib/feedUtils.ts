@@ -81,12 +81,33 @@ function isDeprecatedFollowSet(event: NostrEvent): boolean {
 }
 
 /**
+ * Returns true if event contains globally banned content.
+ * SUNO IS BANNED - no AI-generated music slop.
+ */
+function containsBannedContent(event: NostrEvent): boolean {
+  const content = event.content.toLowerCase();
+  if (content.includes('suno')) return true;
+  
+  // Check all tag values
+  for (const tag of event.tags) {
+    for (const value of tag) {
+      if (typeof value === 'string' && value.toLowerCase().includes('suno')) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Returns true if a feed event should be hidden at the feed level.
  * This pre-filters events BEFORE they are rendered as NoteCards,
  * preventing unnecessary component mounts and layout shifts from
  * components that would return null.
  */
 export function shouldHideFeedEvent(event: NostrEvent): boolean {
+  // BANNED CONTENT - hide globally
+  if (containsBannedContent(event)) return true;
   // Deprecated kind 30000 follow sets
   if (isDeprecatedFollowSet(event)) return true;
   // Unlisted magic decks (kind 37381)
