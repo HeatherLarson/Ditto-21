@@ -1,29 +1,20 @@
 import { Link } from 'react-router-dom';
-import { nip19 } from 'nostr-tools';
-import { Music, Film, Podcast, Play, Headphones, Radio, Bookmark, Sparkles, FolderHeart } from 'lucide-react';
+import { Music, Film, Podcast, Play, Headphones, Radio, Bookmark, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NoteCard } from '@/components/NoteCard';
 import { useAppContext } from '@/hooks/useAppContext';
-import { useFeaturedBookmarkSets, FEATURED_BOOKMARKS_NPUB, type BookmarkSet } from '@/hooks/useFeaturedBookmarks';
+import { useFeaturedBookmarks, FEATURED_BOOKMARKS_NPUB } from '@/hooks/useFeaturedBookmarks';
 
 interface LandingHeroProps {
   onLoginClick: () => void;
   onSignupClick: () => void;
 }
 
-/** Generate naddr for a bookmark set. */
-function getBookmarkSetNaddr(set: BookmarkSet): string {
-  return nip19.naddrEncode({
-    kind: 30003,
-    pubkey: set.event.pubkey,
-    identifier: set.id,
-  });
-}
-
 export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
   const { config } = useAppContext();
-  const { data: bookmarkSets, isLoading: isLoadingBookmarkSets } = useFeaturedBookmarkSets();
+  const { data: featuredBookmarks, isLoading: isLoadingBookmarks } = useFeaturedBookmarks(6);
 
   return (
     <div className="landing-hero relative overflow-hidden">
@@ -119,8 +110,8 @@ export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
         </div>
       </div>
 
-      {/* Featured Bookmark Sets Section */}
-      {(isLoadingBookmarkSets || (bookmarkSets && bookmarkSets.length > 0)) && (
+      {/* Featured Bookmarks Section */}
+      {(isLoadingBookmarks || (featuredBookmarks && featuredBookmarks.length > 0)) && (
         <div className="relative z-10 px-4 pb-6 landing-hero-fade" style={{ animationDelay: '400ms' }}>
           <div className="max-w-3xl mx-auto">
             {/* Section header */}
@@ -128,7 +119,7 @@ export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-600/20">
                 <Sparkles className="size-4 text-amber-500" />
               </div>
-              <h2 className="text-sm font-semibold text-foreground">Heather's Collections</h2>
+              <h2 className="text-sm font-semibold text-foreground">Heather's Picks</h2>
               <div className="flex-1 h-px bg-border/50" />
               <Link 
                 to={`/${FEATURED_BOOKMARKS_NPUB}`}
@@ -139,50 +130,28 @@ export function LandingHero({ onLoginClick, onSignupClick }: LandingHeroProps) {
               </Link>
             </div>
 
-            {/* Bookmark sets grid */}
-            {isLoadingBookmarkSets ? (
-              <div className="grid grid-cols-2 sidebar:grid-cols-3 gap-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4">
-                    <Skeleton className="size-8 rounded-lg mb-3" />
-                    <Skeleton className="h-4 w-24 mb-2" />
-                    <Skeleton className="h-3 w-16" />
+            {/* Bookmarks list */}
+            {isLoadingBookmarks ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+                    <div className="px-4 py-3">
+                      <div className="flex gap-3">
+                        <Skeleton className="size-10 rounded-full shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-3/4" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
-            ) : bookmarkSets && bookmarkSets.length > 0 ? (
-              <div className="grid grid-cols-2 sidebar:grid-cols-3 gap-3">
-                {bookmarkSets.map((set) => (
-                  <Link
-                    key={set.id}
-                    to={`/${getBookmarkSetNaddr(set)}`}
-                    className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4 hover:border-primary/40 hover:bg-card/80 transition-all duration-200"
-                  >
-                    {/* Background glow on hover */}
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-xl transform translate-x-4 -translate-y-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Icon */}
-                    <div className="relative p-2 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-600/20 w-fit mb-3">
-                      <FolderHeart className="size-5 text-amber-500" />
-                    </div>
-                    
-                    {/* Title */}
-                    <h3 className="font-semibold text-sm text-foreground truncate mb-1 group-hover:text-primary transition-colors">
-                      {set.title}
-                    </h3>
-                    
-                    {/* Item count */}
-                    <p className="text-xs text-muted-foreground">
-                      {set.itemCount} {set.itemCount === 1 ? 'item' : 'items'}
-                    </p>
-                    
-                    {/* Description if available */}
-                    {set.description && (
-                      <p className="text-xs text-muted-foreground/80 mt-2 line-clamp-2">
-                        {set.description}
-                      </p>
-                    )}
-                  </Link>
+            ) : featuredBookmarks && featuredBookmarks.length > 0 ? (
+              <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden divide-y divide-border/50">
+                {featuredBookmarks.map((event) => (
+                  <NoteCard key={event.id} event={event} compact />
                 ))}
               </div>
             ) : null}
